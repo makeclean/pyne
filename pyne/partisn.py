@@ -4,6 +4,9 @@ ordinates code produced by Los Almos National Laboratory (LANL). Can be used
 to produce neutron, photon, or coupled neutron photon prblems, adjoint or
 forward or time dependent problems can be run.
 
+The module is designed to operate on either 2D or 3D meshes, and produce the 
+appropriate input.
+
 The Input class is the on being worked on currently and should need the least work
 
 Next should be the Output class to read the output file and rtflux file
@@ -47,6 +50,21 @@ except ImportError:
 if HAVE_PYTAPS:
     from pyne.mesh import Mesh, StatMesh, MeshError, IMeshTag
 
+def _string_width(string,char_len):
+    """This functions takes as argument an arbitrarly long string
+    and will delimit it by newlines every n characters
+    
+    """
+    
+    # 
+
+    # x is now array of strings
+    x = [string[i:i+char_len] for i in range(0, len(string), char_len)]
+    # join the strings by new lines rather than array of strings
+    return_string = "".join(part+"\n" for part in x)
+    return return_string
+
+
 class PartisnInput():
 
     def _block1(mesh):
@@ -70,7 +88,7 @@ class PartisnInput():
         return block1_str
 
 
-    def _block2(mesh):
+    def _block2(self, mesh, bounds):
         """This function reads a structured  mesh object and returns the 2nd data
         block of input, the 2nd data block contains the full definition for the 
         problem geometry and material assignments
@@ -86,13 +104,13 @@ class PartisnInput():
         """
         
         block2_str = "/A# block 2 \n"
-        block2_str += PartisnInput._partisn_geom(mesh)
-        block2_str += PartisnInput._partisn_material(mesh)
+        block2_str += PartisnInput._partisn_geom(self, mesh, bounds)
+        block2_str += PartisnInput._partisn_material(self,mesh)
         block2_str += "t \n"
 
         return block2_str
 
-    def _block3(mesh):
+    def _block3(self, bxslib):
         """This function reads a structured  mesh object and returns the 3rd data
         block of input, the 3rd data block specifies the cross section library
         and edits that you would like. This will be a wall of text that is valid
@@ -109,10 +127,11 @@ class PartisnInput():
         """
         
         block3_str = "/A# block 3 \n"
+        block3_str += PartisnInput._read_bxslib(self, bxslib)
         block3_str += "t \n"
         return block3_str
 
-    def _block4(mesh):
+    def _block4(self):
         """This function reads a structured  mesh object and returns the 4th data
         block of input, the 4th data block specifies the material definitions
         from the problem. The "pure" materials which make up the problem are defined
@@ -134,7 +153,7 @@ class PartisnInput():
         return block4_str
 
 
-    def _block5(mesh):
+    def _block5(self):
         """This function reads a structured  mesh object and returns the 5th data
         block of input, the 5th data block specifies the source behaviour and 
         normalisation
@@ -153,7 +172,7 @@ class PartisnInput():
         block5_str += "t \n"
         return block5_str
     
-    def _partisn_geom(mesh):
+    def _partisn_geom(self, mesh, bounds):
         """This function reads a structured  mesh object and returns the mesh 
         portion of a PartiSn input deck
         
@@ -167,10 +186,77 @@ class PartisnInput():
         A string containing the PartiSn mesh boundaries and geometry that 
         can be written directly as valid syntax 
         """
-        geom = "* temporary placeholder for geom \n"
+
+        x_coords = mesh.structured_get_divisions("x")
+        y_coords = mesh.structured_get_divisions("y")
+        z_coords = mesh.structured_get_divisions("z")        
+
+        # coarse bin boundaries
+        geom  = "/ coarse bins \n"
+        xmesh =  "xmesh =" + " ".join(format(x, "f") for x in x_coords) 
+        geom  += _string_width(xmesh,50)
+        ymesh = "ymesh =" + " ".join(format(x, "f") for x in y_coords) 
+        geom  += _string_width(ymesh,50)
+        zmesh = "zmesh =" + " ".join(format(x, "f") for x in z_coords) 
+        geom  += _string_width(zmesh,50)
+
+
+        # number of fine mesh intervals between each coarse bin
+        geom += "/ fine bins \n"
+        xints = "xints =" + " ".join(format(x, "d") for x in bounds[0])
+        geom  += _string_width(xints,50)
+        yints = "yints =" + " ".join(format(x, "d") for x in bounds[1])
+        geom  += _string_width(yints,50)
+        zints = "zints =" + " ".join(format(x, "d") for x in bounds[2])
+        geom  += _string_width(zints,50)
+
+        # now write out the material assignments, integer material reference
+        # number from 0 (void) to N
+
+        # for now write out all zones 0
+        geom += "/ material assignments \n"
+        zones = "zones= " + " ".join(format(0,"d") for x in mesh)
+        geom += _string_width(zones,50)
+        
+        geom += "* temporary placeholder for geom \n"
+
         return geom
 
-    def _partisn_material(mesh):
+    def _read_bxslib(self,filename):
+        """ This function reads a supplied binary Partisn cross section file
+        (bxslib) and provides the possible materials and prepared edits
+
+        Parameters
+        ----------
+        filename : the filename of the bxsfile 
+        
+        Returns
+        -------
+        edits : a list of the possible edit and material names
+        """
+        
+        bxslib = open(filename,'rb')
+
+        string = ""
+        edits = ""
+
+        xs_names=[]
+
+        # 181st byte is the start of xsnames
+        bxslib.seek(180)
+        done = False
+        while not done:
+            for i in range(0,8):
+                bytes = bxslib.read(1)
+                pad1=struct.unpack('s',bytes)[0]
+                if '\x00' in pad1:
+                    done = True
+                    return xs_names
+                string += pad1
+            xs_names.append(string)
+            string=""
+
+    def _partisn_material(self,mesh):
         """This function reads a structured  mesh object and returns the material
         assignnent portion of a PartiSn input deck
         
@@ -184,11 +270,12 @@ class PartisnInput():
         A string containing the PartiSn material assignments and is valid
         PartiSn syntax
         """
+                
         material = "* temporary placeholder for material \n"
         
         return material
 
-    def write_partisn(mesh, filename):
+    def write_partisn(self, mesh, bounds, filename, bxslib):
         """This function reads a structured mesh object and returns the 
         the complete PartiSn input deck and writes it out to file
 
@@ -203,13 +290,14 @@ class PartisnInput():
         file if it exists
         """
         
-        output_data = ("* PartiSn input deck produced automatially by PyNE \n"
+        output_data = ("   1    0    0 \n" 
+                       "* PartiSn input deck produced automatically by PyNE \n"
                        "* pyne.partisn module \n")
-        output_data += PartisnInput._block1(mesh)
-        output_data += PartisnInput._block2(mesh)
-        output_data += PartisnInput._block3(mesh)
-        output_data += PartisnInput._block4(mesh)
-        output_data += PartisnInput._block5(mesh)
+        output_data += PartisnInput._block1(self)
+        output_data += PartisnInput._block2(self, mesh, bounds)
+        output_data += PartisnInput._block3(self, bxslib)
+        output_data += PartisnInput._block4(self)
+        output_data += PartisnInput._block5(self)
         output_data += ("/ ********************* \n"
                         "* You must produce your own edits\n")
 
