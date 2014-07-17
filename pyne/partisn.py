@@ -5,9 +5,15 @@ to produce neutron, photon, or coupled neutron photon prblems, adjoint or
 forward or time dependent problems can be run.
 
 The module is designed to operate on either 2D or 3D meshes, and produce the 
-appropriate input.
+appropriate input. It would be lovely if we eventually manage to get it working
+with 1D as well as this appears to be a common mode of operation for PartiSn.
 
 The Input class is the on being worked on currently and should need the least work
+to improve. Fundamental inputs to the PartiSn class are: 
+    cell_fracs, a list of cell fractions with the number of materials 
+                as produced by DG
+    mesh, a PyNE mesh instance including materials
+    bxslib, the filename of the PartiSn cross section file 
 
 Next should be the Output class to read the output file and rtflux file
 
@@ -92,6 +98,11 @@ class PartisnInput():
         """This function reads a structured  mesh object and returns the 2nd data
         block of input, the 2nd data block contains the full definition for the 
         problem geometry and material assignments
+
+        This may seem bizarre, it is however correct that the PartiSn material
+        assignments are done here, by assigning an integer correspondence 
+        to the number of unique material combinations (which themselves are
+        not defined until block4)
         
         Parameters
         ----------
@@ -116,6 +127,9 @@ class PartisnInput():
         and edits that you would like. This will be a wall of text that is valid
         PartiSn input
         
+        We define the nuclides that make up the "Permenant Materials" here along
+        with the edits that were found in the cross section file.
+
         Parameters
         ----------
         mesh : PyNE Mesh object
@@ -127,7 +141,13 @@ class PartisnInput():
         """
         
         block3_str = "/A# block 3 \n"
-        block3_str += PartisnInput._read_bxslib(self, bxslib)
+        print (PartisnInput._read_bxslib(self, bxslib))
+        block3_str += "lib="+bxslib
+        # the next line is the number of neutron energy groups in the file bxslib
+        # need to find a way to query the file to get the number of photon and 
+        # neutron energy groups
+        block3_str += "lng=175"
+#        block3_str += PartisnInput._read_bxslib(self, bxslib)
         block3_str += "t \n"
         return block3_str
 
@@ -138,6 +158,10 @@ class PartisnInput():
         and then the mixtures that make up the zones are required, i.e. each unique
         mixture needs to be represented
         
+        First we create the matls array, which contains the materials that will later be 
+        mixed by volume fraction from Discretise Geom step. These materials represent
+        pure (The PartiSn manual refers to them as "Permenant Materials")
+
         Parameters
         ----------
         mesh : PyNE Mesh object
@@ -224,7 +248,9 @@ class PartisnInput():
 
     def _read_bxslib(self,filename):
         """ This function reads a supplied binary Partisn cross section file
-        (bxslib) and provides the possible materials and prepared edits
+        (bxslib) and provides a list of the possible materials and prepared edits
+        from the cross section file. This is particularly hackish, and someone should
+        look into this with much more time than me.
 
         Parameters
         ----------
