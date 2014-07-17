@@ -56,6 +56,46 @@ except ImportError:
 if HAVE_PYTAPS:
     from pyne.mesh import Mesh, StatMesh, MeshError, IMeshTag
 
+def read_bxslib(filename):
+    """ This function reads a supplied binary Partisn cross section file
+    (bxslib) and provides a list of the possible materials and prepared edits
+    from the cross section file. This is particularly hackish, and someone should
+    look into this with much more time than me.
+    
+    Due to the way PartisN handles materials it will not be possible (currently) to
+    know which nuclides are which automatically, instead this function can be used
+    to list which nuclides are which. This list should then be furnished to 
+    
+    Parameters
+    ----------
+    filename : the filename of the bxsfile 
+    
+    Returns
+    -------
+    edits : a list of the possible edit and material names
+    """
+    
+    bxslib = open(filename,'rb')
+    
+    string = ""
+    edits = ""
+    
+    xs_names=[]
+    
+    # 181st byte is the start of xsnames
+    bxslib.seek(180)
+    done = False
+    while not done:
+        for i in range(0,8):
+            bytes = bxslib.read(1)
+            pad1=struct.unpack('s',bytes)[0]
+            if '\x00' in pad1:
+                done = True
+                return xs_names
+            string += pad1
+        xs_names.append(string.strip(" "))
+        string=""
+
 def _string_width(string,char_len):
     """This functions takes as argument an arbitrarly long string
     and will delimit it by newlines every n characters
@@ -141,13 +181,12 @@ class PartisnInput():
         """
         
         block3_str = "/A# block 3 \n"
-        print (PartisnInput._read_bxslib(self, bxslib))
-        block3_str += "lib="+bxslib
+        block3_str += "lib="+bxslib+"\n"
         # the next line is the number of neutron energy groups in the file bxslib
         # need to find a way to query the file to get the number of photon and 
         # neutron energy groups
-        block3_str += "lng=175"
-#        block3_str += PartisnInput._read_bxslib(self, bxslib)
+        block3_str += "lng=175 \n"
+        # the list of nuclides comes from the bxslib
         block3_str += "t \n"
         return block3_str
 
@@ -245,42 +284,6 @@ class PartisnInput():
         geom += "* temporary placeholder for geom \n"
 
         return geom
-
-    def _read_bxslib(self,filename):
-        """ This function reads a supplied binary Partisn cross section file
-        (bxslib) and provides a list of the possible materials and prepared edits
-        from the cross section file. This is particularly hackish, and someone should
-        look into this with much more time than me.
-
-        Parameters
-        ----------
-        filename : the filename of the bxsfile 
-        
-        Returns
-        -------
-        edits : a list of the possible edit and material names
-        """
-        
-        bxslib = open(filename,'rb')
-
-        string = ""
-        edits = ""
-
-        xs_names=[]
-
-        # 181st byte is the start of xsnames
-        bxslib.seek(180)
-        done = False
-        while not done:
-            for i in range(0,8):
-                bytes = bxslib.read(1)
-                pad1=struct.unpack('s',bytes)[0]
-                if '\x00' in pad1:
-                    done = True
-                    return xs_names
-                string += pad1
-            xs_names.append(string)
-            string=""
 
     def _partisn_material(self,mesh):
         """This function reads a structured  mesh object and returns the material
