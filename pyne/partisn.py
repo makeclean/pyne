@@ -201,6 +201,11 @@ class PartisnInput():
         mixed by volume fraction from Discretise Geom step. These materials represent
         pure (The PartiSn manual refers to them as "Permenant Materials")
 
+        Then we create the assign array, which contains the list of unqiue mixtures of 
+        materials that exsit in the problem. For Simple geometries where the mesh
+        conforms this may be a rather pauce array, however, for a non coformal geometry
+        this may be large
+
         Parameters
         ----------
         mesh : PyNE Mesh object
@@ -221,6 +226,9 @@ class PartisnInput():
         block of input, the 5th data block specifies the source behaviour and 
         normalisation
         
+        Block 5 specifies the scattering order and the spatio-energetic nature of 
+        the source
+
         Parameters
         ----------
         mesh : PyNE Mesh object
