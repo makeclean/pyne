@@ -1212,8 +1212,7 @@ def test_fluka():
     exp += ' \n'
     exp += 'MATERIAL          1.        1.      19.1       27.                    URANIUM'
     exp += '   \n'
-    exp += 'COMPOUND        0.04     235-U      0.96     238-U                    URANIUM'
-    exp += '   \n'
+    exp += 'COMPOUND        0.04     235-U      0.96     238-U                    URANIUM   '
 
     assert_equal(exp,written)
 
@@ -1251,8 +1250,7 @@ def test_fluka():
     exp += ' \n'
     exp += 'MATERIAL          1.        1.      19.1       27.                    URANIUM'
     exp += '   \n'
-    exp += 'COMPOUND       -0.04     235-U     -0.96     238-U                    URANIUM'
-    exp += '   \n'
+    exp += 'COMPOUND       -0.04     235-U     -0.96     238-U                    URANIUM   '
 
     assert_equal(exp,written)
 
