@@ -526,7 +526,7 @@ std::string pyne::Material::mcnp(std::string frac_type) {
   // Metadata mat_num
   oss << "m";
   if (metadata.isMember("mat_number")) {
-    int mat_num = metadata["mat_number"].asInt();
+    std::string mat_num = metadata["mat_number"].asString();
     oss << mat_num << std::endl;
   } else {
     oss << "?" << std::endl;
