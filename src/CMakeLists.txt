@@ -59,7 +59,7 @@ endif (MOAB_FOUND)
 add_library(pyne ${PYNE_SRCS})
 target_link_libraries(pyne hdf5 blas lapack)
 if (MOAB_FOUND)
-    target_link_libraries(pyne dagmc MOAB)
+    target_link_libraries(pyne ${DAGMC_LIBRARIES})
 endif (MOAB_FOUND)
 
 # Print include dir
