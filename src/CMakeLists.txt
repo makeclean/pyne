@@ -1,6 +1,6 @@
 set(PYNE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" ${PYNE_INCLUDE_DIRS} PARENT_SCOPE)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${MOAB_INCLUDE_DIRS}")
 
 # setup source files
 set(AHOT_SRCS
@@ -47,20 +47,17 @@ set(PYNE_SRCS
     "${AHOT_SRCS}"
     )
 
-if (MOAB_FOUND)
+
     set(PYNE_SRCS "${PYNE_SRCS}"
         "dagmc_bridge.cpp"
         "measure.cpp"
         "source_sampling.cpp"
         )
-endif (MOAB_FOUND)
 
 # compile and link library
 add_library(pyne ${PYNE_SRCS})
 target_link_libraries(pyne hdf5 blas lapack)
-if (MOAB_FOUND)
-    target_link_libraries(pyne ${DAGMC_LIBRARIES})
-endif (MOAB_FOUND)
+target_link_libraries(pyne ${DAGMC_LIBRARIES})
 
 # Print include dir
 get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)

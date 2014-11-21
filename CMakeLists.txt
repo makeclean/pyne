@@ -77,6 +77,10 @@ message("-- MOAB Found: ${MOAB_FOUND}")
 if(${MOAB_FOUND})
     include_directories(${MOAB_INCLUDE_DIRS})
     set(LIBS ${LIBS} ${DAGMC_LIBRARIES})
+    message(STATUS "MOAB Libs: " ${DAGMC_LIBRARIES} )
+    message(STATUS "MOAB Includes: " ${MOAB_INCLUDE_DIRS} )
+else(${MOAB_FOUND})
+    message("MOAB NOT Found")
 endif(${MOAB_FOUND})
 
 # Include the CMake script UseCython.cmake.  This defines add_cython_module().
