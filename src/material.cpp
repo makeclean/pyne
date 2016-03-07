@@ -1540,6 +1540,27 @@ std::map<int, double> pyne::Material::to_atom_dens() {
   return atom_dens;
 }
 
+int pyne::Material::sampler(double random, std::string frac_type) {
+  // Returns a random nuclide/element from the list of nuclides/elements
+  // present in the material composition, either sampling from mass frac
+  // or atom frac
+  // assumes the user will input by argument a uniform random deviate
+  pyne::Material mat = Material();
+  if(frac_type == "atom") {
+    mat.to_atom_frac();
+  }
+
+  // get cdf of components on the fly
+  comp_iter it;
+  double cdf = 0.0;
+  // step through the composition
+  for ( it = comp.begin() ; it != comp.end() ; ++it ) {
+    cdf += it->second;
+    if ( cdf >= random ) return it->first;
+  }
+  // otherwise we fail
+  return 0;
+}
 
 std::vector<std::pair<double, double> > pyne::Material::gammas() {
   std::vector<std::pair<double, double> > result;

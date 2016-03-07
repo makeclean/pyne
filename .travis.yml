@@ -31,7 +31,7 @@ install:
   # download CI repo
   - wget https://github.com/pyne/pyne-ci/archive/master.zip -O pyne-ci.zip
   - unzip -j pyne-ci.zip "*/pyne/*" -d conda-recipe
-  
+  - env  
   # Replace dep1 dep2 ... with your dependencies
   #- conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION dep1 dep2 ...
   #- source activate test-environment
