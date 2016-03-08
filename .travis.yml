@@ -9,6 +9,7 @@ addons:
   apt:
     packages:
       - gfortran-4.6
+      - locate
 install:
   # set the gfortran stuff
   - export FC=/usr/bin/gfortran-4.6
