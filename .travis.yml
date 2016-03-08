@@ -1,13 +1,23 @@
 language: python
+sudo: false
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
   - "2.7"
   - "3.4"
   - "3.5"
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y gfortran
+addons:
+  apt:
+    packages:
+      - gfortran-4.6
 install:
+  # set the gfortran stuff
+  - export FC=/usr/bin/gfortran-4.6
+  - mkdir $HOME/.local
+  - mkdir $HOME/.local/bin
+  - mkdir $HOME/.local/lib
+  - ln -s /usr/bin/gfortran-4.6 $HOME/.local/bin/gfortran
+  - ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so $HOME/.local/lib/libgfortran.so
+  - ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so $HOME/.local/lib/libgfortran.so.3
   # You may want to periodically update this, although the conda update
   # conda line below will keep everything up-to-date.  We do this
   # conditionally because it saves us some downloading if the version is
@@ -29,7 +39,7 @@ install:
   - conda info -a
   
   # download CI repo
-  - wget https://github.com/pyne/pyne-ci/archive/master.zip -O pyne-ci.zip
+  - wget https://github.com/makeclean/pyne-ci/archive/master.zip -O pyne-ci.zip
   - unzip -j pyne-ci.zip "*/pyne/*" -d conda-recipe
   
   # Replace dep1 dep2 ... with your dependencies
