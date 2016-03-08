@@ -34,14 +34,14 @@ install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no 
   - conda config --add channels pyne
-  - conda config --add channels cyclus
+#  - conda config --add channels cyclus
   - conda update -q conda
   - conda install conda-build jinja2 setuptools binstar patchelf nose
   # Useful for debugging any issues with conda
   - conda info -a
   
   # download CI repo
-  - wget https://github.com/makeclean/pyne-ci/archive/master.zip -O pyne-ci.zip
+  - wget https://github.com/pyne/pyne-ci/archive/master.zip -O pyne-ci.zip
   - unzip -j pyne-ci.zip "*/pyne/*" -d conda-recipe
   
   # Replace dep1 dep2 ... with your dependencies
