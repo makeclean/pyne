@@ -18,6 +18,7 @@ install:
   - ln -s /usr/bin/gfortran-4.6 $HOME/.local/bin/gfortran
   - ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so $HOME/.local/lib/libgfortran.so
   - ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so $HOME/.local/lib/libgfortran.so.3
+  - export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
   # You may want to periodically update this, although the conda update
   # conda line below will keep everything up-to-date.  We do this
   # conditionally because it saves us some downloading if the version is
