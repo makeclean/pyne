@@ -12,7 +12,8 @@ addons:
 install:
   # set the gfortran compiler location
   - export FC=/usr/bin/gfortran-4.6
-  - ln -fs /usr/bin/gfortran-4.6 "$HOME/.local/bin/gfortran"
+  - mkdir $HOME/.local/bin
+  - ln -s /usr/bin/gfortran-4.6 $HOME/.local/bin/gfortran
   # You may want to periodically update this, although the conda update
   # conda line below will keep everything up-to-date.  We do this
   # conditionally because it saves us some downloading if the version is
