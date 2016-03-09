@@ -10,7 +10,7 @@ services:
 before_install:
   - docker pull pynedist/pyne-ubuntu
 install:
-  - docker run pynedist/pyne-ubuntu /bin/sh -c "git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
+  - docker run pynedist/pyne-ubuntu /bin/sh -c "git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
 script:
   - docker run pynedist/pyne-ubuntu /bin/sh -c "cd tests"
   - docker run pynedist/pyne-ubuntu /bin/sh -c "./travis-run-tests.sh"
