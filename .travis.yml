@@ -13,7 +13,8 @@ install:
 #  - docker run pynedist/pyne-ubuntu /bin/sh -c "git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
 script:
   - docker run pynedist/pyne-ubuntu /bin/bash -c "git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
-  - docker run pynedist/pyne-ubuntu /bin/bash - c "cd pyne ; tests ; ./travis-run-tests.sh"
+  - docker run pynedist/pyne-ubuntu /bin/bash -c "nuc_data_make"
+  - docker run pynedist/pyne-ubuntu /bin/bash -c "cd pyne ; tests ; ./travis-run-tests.sh"
 #  - docker run pynedist/pyne-ubuntu /bin/sh -c "cd pyne ; cd tests ; ./travis-run-tests.sh"
   # Build the pyne-amalgamation test program 
   # - git clone https://github.com/pyne/pyne-amalgamation.git
