@@ -670,6 +670,22 @@ cdef class _Material:
         """
         return self.mat_pointer.molecular_mass(atoms_per_molecule)
 
+
+    def sampler(self, random_number, frac_type="mass"):
+        """sampler(self, random_number, frac_type="mass")
+        Takes a given material object and returns a random nucid from
+        its comp_map
+        
+        Returns
+        -------
+        nucid : the nucid of one of the components
+            A random nucid
+        
+        """
+        nucid =	self.mat_pointer.sampler(random_number,frac_type)
+        return nucid
+
+
     def expand_elements(self):
         """expand_elements(self)
         Exapnds the elements ('U', 'C', etc) in the material by replacing them
