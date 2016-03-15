@@ -11,11 +11,12 @@ before_install:
   - docker pull pynedist/pyne-ubuntu
 install:
   - docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/ ; git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
-  - docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make ; cd tests ; ./travis-run-tests.sh"
   - docker run pynedist/pyne-ubuntu /bin/bash -c "ls /root/"
   - docker run pynedist/pyne-ubuntu /bin/bash -c "ls /root/opt"
   - docker run pynedist/pyne-ubuntu /bin/bash -c "ls /root/opt/pyne"
   - docker run pynedist/pyne-ubuntu /bin/bash -c "ls /root/.local/"
+  - docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make ; cd tests ; ./travis-run-tests.sh"
+
 script:
 # ; cd .. ; /root/.local/bin/nuc_data_make ; cd pyne ; cd tests ; ./travis-run-tests.sh"
 #  - docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/pyne ; cd tests ; ./travis-run-tests.sh"
