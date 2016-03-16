@@ -20,7 +20,7 @@ script:
    - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make" 
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
-   - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/:/root/.local/lib/python2.7/site-packages/itaps/" -e PYTHONPATH="/root/.local/lib/python2.7/site-packages/PyTAPS-1.4-py2.7-linux-x86_64.egg" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; ./travis-run-tests.sh"
+   - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/:/root/.local/lib/python2.7/site-packages//PyTAPS-1.4-py2.7-linux-x86_64.egg/" -e PYTHONPATH="/root/.local/lib/python2.7/site-packages/PyTAPS-1.4-py2.7-linux-x86_64.egg/" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; ./travis-run-tests.sh"
    - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; git clone https://github.com/pyne/pyne-amalgamation.git"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
