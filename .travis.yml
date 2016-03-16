@@ -17,19 +17,21 @@ install:
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
 script:
-   - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/" pynedist/pyne-ubuntu /bin/bash -c "ls /root/.local/lib/python2.7/site-packages/pyne/lib" 
    - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make" 
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
    - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; ./travis-run-tests.sh"
-   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "git clone https://github.com/pyne/pyne-amalgamation.git"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; git clone https://github.com/pyne/pyne-amalgamation.git"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
-   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "python amalgamate.py"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/ ; python amalgamate.py"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
-   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "mv pyne.h pyne.cpp tests/pyne-amalgamation"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/ ; mv pyne.h pyne.cpp tests/pyne-amalgamation"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
 # need to add amalgamate test
-
+   - sudo docker run -e LIBS="/root/opt/moab/lib:/root/.local/lib" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; make BASE=$LIBS pyne-amalgamation"
+   - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
+   - sudo docker commit $commit_id pynedist/pyne-ubuntu
+   
