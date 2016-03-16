@@ -13,28 +13,22 @@ install:
    - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/ ; git clone https://github.com/pyne/pyne"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
-   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "pwd"
-   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "ls"
-   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "ls /root/opt/pyne"
    - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/pyne/ ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
 script:
-   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "/root/.local/bin/nuc_data_make" 
+   - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/python2.7/site-packages/pyne*/lib" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make" 
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
-   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd tests"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; ./travis-run-tests.sh"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "git clone https://github.com/pyne/pyne-amalgamation.git"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "python amalgamate.py"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
-   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "./travis-run-tests.sh"
-  # Build the pyne-amalgamation test program 
-  # - git clone https://github.com/pyne/pyne-amalgamation.git
-  #- cd ..
-  #- python amalgamate.py
-  #- mv pyne.h pyne.cpp tests/pyne-amalgamation
-  #- cd tests
-  #- BASE=/home/travis/miniconda make -C pyne-amalgamation
-
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "mv pyne.h pyne.cpp tests/pyne-amalgamation"
+   - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
+   - sudo docker commit $commit_id pynedist/pyne-ubuntu
+# need to add amalgamate test
 
