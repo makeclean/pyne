@@ -31,7 +31,7 @@ script:
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
 # need to add amalgamate test
-   - sudo docker run -e LIBS="/root/opt/moab/lib:/root/.local/lib" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; make BASE=$LIBS all"
+   - sudo docker run -e LIBS="/root/opt/moab/lib:/root/.local/lib" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests/pyne-amalgamation ; make BASE=$LIBS all"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
    
