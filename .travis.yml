@@ -13,6 +13,8 @@ install:
    - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "git clone https://github.com/pyne/pyne"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
+   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "pwd"
+   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "ls"
    - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/pyne/ ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
