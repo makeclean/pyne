@@ -17,7 +17,7 @@ install:
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
 script:
-   - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make" 
+   - sudo docker run -e LD_LIBRARY_PATH="/root/.local/lib/" PYTHONPATH="/root/.local/lib/python2.7/site-packages/" pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne ; /root/.local/bin/nuc_data_make" 
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
    - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/pyne/tests ; ./travis-run-tests.sh"
