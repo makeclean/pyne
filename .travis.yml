@@ -8,12 +8,15 @@ python:
 services:
   - docker
 before_install:
-  - docker pull pynedist/pyne-ubuntu
+  - sudo docker pull pynedist/pyne-ubuntu
 install:
-#  - docker run pynedist/pyne-ubuntu /bin/sh -c "git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
+   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "git clone https://github.com/pyne/pyne"
+   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd pyne"
+   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
 script:
-  - docker run pynedist/pyne-ubuntu /bin/bash -c "cd /root/opt/ ; git clone https://github.com/pyne/pyne ; cd pyne ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include ; cd .. ; /root/.local/bin/nuc_data_make ; cd pyne ; cd tests ; ./travis-run-tests.sh"
-#  - docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/pyne ; cd tests ; ./travis-run-tests.sh"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "/root/.local/bin/nuc_data_make" 
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "cd tests"
+   - sudo docker run pynedist/pyne-ubuntu /bin/bash -c "./travis-run-tests.sh"
   # Build the pyne-amalgamation test program 
   # - git clone https://github.com/pyne/pyne-amalgamation.git
   #- cd ..
