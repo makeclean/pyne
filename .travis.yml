@@ -3,14 +3,16 @@ language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
   - "2.7"
-  - "3.4"
-  - "3.5"
+#  - "3.4"
+#  - "3.5"
 services:
   - docker
 before_install:
   - sudo docker pull pynedist/pyne-ubuntu
 install:
-   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/ ; git clone https://github.com/pyne/pyne"
+# copy the git repo being tested into the docker instance
+   - sudo docker cp pyne pynedist/pyne-ubuntu:/root/opt/pyne
+#   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/ ; git clone https://github.com/pyne/pyne"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
    - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/pyne/ ; python setup.py install --user -- -DMOAB_LIBRARY=/root/opt/moab/lib/libMOAB.so -DMOAB_INCLUDE_DIR=/root/opt/moab/include"
