@@ -11,7 +11,9 @@ before_install:
   - sudo docker pull pynedist/pyne-ubuntu
 install:
 # copy the git repo being tested into the docker instance
-   - sudo docker cp pyne pynedist/pyne-ubuntu:/root/opt/pyne
+   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/"
+   - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
+   - sudo docker cp pyne $commit_id:/root/opt/pyne
 #   - sudo docker run pynedist/pyne-ubuntu /bin/sh -c "cd /root/opt/ ; git clone https://github.com/pyne/pyne"
    - commit_id=`sudo docker ps -l | tail -n1 | awk '{print $1}'`
    - sudo docker commit $commit_id pynedist/pyne-ubuntu
