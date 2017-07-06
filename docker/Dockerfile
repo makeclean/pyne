@@ -18,8 +18,9 @@ RUN \
 RUN \ 
     cd /opt && \
     mkdir moab && \
-    git clone https://bitbucket.org/fathomteam/moab && \
     cd moab && \
+    git clone https://bitbucket.org/fathomteam/moab moab-src && \
+    cd moab-src && \
     git checkout Version5.0 && \
     autoreconf -fi && \
     mkdir bld && \
@@ -28,8 +29,8 @@ RUN \
     make -j4 && \ 
     make check && \ 
     make install && \
-    cd .. && \ 
-    rm -rf bld moab && \
+    cd ../.. && \ 
+    rm -rf moab-src && \
 # this line patches the current moab version for pytaps comptability
     sed -i '/IMESH_LIBS/i IMSQ_LIBS = \n MSQ_LIBS = ' lib/iMesh-Defs.inc 
 RUN \
@@ -43,6 +44,23 @@ RUN \
     mv PyTAPS-1.4 pytaps && \
     cd pytaps && \
     python setup.py --iMesh-path=/opt/moab --without-iRel --without-iGeom install --user
+RUN \
+    cd /opt && \
+    mkdir dagmc && \
+    cd dagmc && \
+    git clone https://github.com/svalinn/DAGMC dagmc-src && \
+    cd dagmc-src && \
+    git checkout develop && \
+    mkdir bld && \
+    cd bld && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/opt/dagmc -DMOAB_ROOT=/opt/moab/lib && \
+    make && \
+    make install && \
+    cd ../.. && \
+    rm -rf dagmc-src
+RUN \
+    echo "export LD_LIBRARY_PATH=/opt/dagmc/lib:\${LD_LIBRARY_PATH}" >> /opt/env.sh && \
+    cat /opt/env.sh
 RUN touch /root/.bashrc
 RUN echo 'source /opt/env.sh' >> /root/.bashrc
 # Set environment variables.
