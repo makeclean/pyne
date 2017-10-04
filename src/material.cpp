@@ -1171,42 +1171,38 @@ pyne::Material pyne::Material::expand_elements() {
   // Expands the natural elements of a material and returns a new material note
   // that this implementation relies on the fact that maps of ints are stored in
   // a sorted manner in C++.
-  int n, nabund, znuc, zabund;
-  comp_map newcomp;
-  std::map<int, double>::iterator abund_itr, abund_end;
+
   if (pyne::natural_abund_map.empty())
     pyne::_load_atomic_mass_map();
-  abund_itr = pyne::natural_abund_map.begin();
-  abund_end = pyne::natural_abund_map.end();
-  zabund = nucname::znum((*abund_itr).first);
-  for (comp_iter nuc = comp.begin(); nuc != comp.end(); nuc++) {
-    if(abund_itr == abund_end)
-      newcomp.insert(*nuc);
-    else if(0 == nucname::anum((*nuc).first)) {
-      n = (*nuc).first;
-      znuc = nucname::znum(n);
-      if (znuc < zabund) {
-        newcomp.insert(*nuc);
-        continue;
+
+  comp_map new_comp;
+  
+  for (comp_iter nuc = comp.begin() ; nuc != comp.end() ; nuc++ ) {
+    // if the nuc has an anum - i.e. it already has nucleon number
+    if ( nucname::anum(nuc->first)) {
+      // insert the nuclide directly in the new material
+      new_comp[nuc->first] = nuc->second;
+    } else {
+      // we must expand the element into a nuclide wise form
+      std::map<int,double>::iterator nat_abund_itr;
+      for ( nat_abund_itr = pyne::natural_abund_map.begin() ;
+	    nat_abund_itr != pyne::natural_abund_map.end() ;
+	    nat_abund_itr++ ) {
+	// the atomic number of the element matches that in the abundance map
+	if ( nucname::znum(nuc->first) == nucname::znum(nat_abund_itr->first) ) {
+	  // nucid of the nuclide
+	  int nucid = nat_abund_itr->first;
+	  double nuclide_mass = (nat_abund_itr->second) * (nuc->second) *	
+	    atomic_mass(nucid) / atomic_mass(nuc->first);
+	  new_comp[nucid] = nuclide_mass;
+	}
+	// maybe consider breaking out of this inner loop if the atomic number
+	// is more than nuclide being considered?
       }
-      while(zabund <= znuc) {
-        nabund = (*abund_itr).first;
-        if (zabund == znuc && 0 != nucname::anum(nabund) && 0.0 != (*abund_itr).second)
-          newcomp[nabund] = (*abund_itr).second * (*nuc).second * \
-                            atomic_mass(nabund) / atomic_mass(n);
-        else if (n == nabund && 0.0 == (*abund_itr).second)
-          newcomp.insert(*nuc);
-        abund_itr++;
-        if (abund_itr == abund_end) {
-          zabund = INT_MAX;
-          break;
-        }
-        zabund = nucname::znum(nabund);
-      }
-    } else
-      newcomp.insert(*nuc);
+    }
   }
-  return Material(newcomp, mass, density, atoms_per_molecule, metadata);
+
+  return Material(new_comp, mass, density, atoms_per_molecule, metadata);
 }
 
 pyne::Material pyne::Material::collapse_elements(std::set<int> exception_ids) {
