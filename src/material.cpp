@@ -1179,7 +1179,9 @@ pyne::Material pyne::Material::expand_elements() {
   
   for (comp_iter nuc = comp.begin() ; nuc != comp.end() ; nuc++ ) {
     // if the nuc has an anum - i.e. it already has nucleon number
-    if ( nucname::anum(nuc->first)) {
+    // or if the nuclide has atomic number than 92 - ie there is no
+    // natural composition
+    if ( nucname::anum(nuc->first) != 0 | nucname::znum(nuc->first) > 92) {
       // insert the nuclide directly in the new material
       new_comp[nuc->first] = nuc->second;
     } else {
@@ -1189,12 +1191,15 @@ pyne::Material pyne::Material::expand_elements() {
 	    nat_abund_itr != pyne::natural_abund_map.end() ;
 	    nat_abund_itr++ ) {
 	// the atomic number of the element matches that in the abundance map
-	if ( nucname::znum(nuc->first) == nucname::znum(nat_abund_itr->first) ) {
+	if ( nucname::znum(nuc->first) == nucname::znum(nat_abund_itr->first) && (nucname::anum(nat_abund_itr->first) > 0)) {
 	  // nucid of the nuclide
 	  int nucid = nat_abund_itr->first;
-	  double nuclide_mass = (nat_abund_itr->second) * (nuc->second) *	
-	    atomic_mass(nucid) / atomic_mass(nuc->first);
-	  new_comp[nucid] = nuclide_mass;
+	  if( atomic_mass(nuc->first) > 0 && nuc->second > 0
+	      && atomic_mass(nucid) > 0 && nat_abund_itr->second > 0 ) {
+            double nuclide_mass = (nat_abund_itr->second) * (nuc->second) *
+              atomic_mass(nucid) / atomic_mass(nuc->first);
+            new_comp[nucid] = nuclide_mass;
+          }
 	}
 	// maybe consider breaking out of this inner loop if the atomic number
 	// is more than nuclide being considered?
